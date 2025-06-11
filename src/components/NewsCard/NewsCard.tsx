@@ -34,7 +34,7 @@ export default function NewsCard({
       <CardMedia
         component="img"
         height="180"
-        image={image || "https://via.placeholder.com/600x400?text=Новина"}
+        image={image || "https://placehold.co/600x400?text=No%20Photo"}
         alt={title}
       />
       <CardContent sx={{ flexGrow: 1 }}>
