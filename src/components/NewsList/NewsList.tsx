@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { List, ListItem } from "@mui/material";
-import Skeleton from "@mui/material/Skeleton";
+import { Box, Skeleton } from "@mui/material";
+import Masonry from "@mui/lab/Masonry";
 import NewsCard from "../NewsCard/NewsCard";
 
 type Article = {
@@ -10,6 +10,7 @@ type Article = {
   url: string;
   source: string;
   published_at: string;
+  image?: string;
 };
 
 const API_KEY = import.meta.env.VITE_MEDIASTACK_API_KEY;
@@ -27,12 +28,12 @@ export default function NewsList() {
             countries: "us",
             languages: "en",
             sort: "published_desc",
-            limit: 10,
+            limit: 15,
           },
         });
         setArticles(res.data.data);
       } catch (err) {
-        console.error("error while receiving news:", err);
+        console.error("Error while receiving news:", err);
       } finally {
         setLoading(false);
       }
@@ -41,26 +42,42 @@ export default function NewsList() {
     fetchNews();
   }, []);
 
+  const content = (loading ? Array.from({ length: 8 }) : articles).map(
+    (item, i) => (
+      <Box key={i}>
+        {loading ? (
+          <Box>
+            <Skeleton variant="rectangular" height={200} sx={{ mb: 2 }} />
+            <Skeleton height={28} width="90%" />
+            <Skeleton height={20} width="70%" />
+          </Box>
+        ) : (
+          <NewsCard {...(item as Article)} />
+        )}
+      </Box>
+    )
+  );
+
   return (
-    <List>
-      {(loading ? Array.from({ length: 6 }) : articles).map((item, i) => (
-        <ListItem key={i} disablePadding sx={{ mb: 2 }}>
-          {loading ? (
-            <>
-              <Skeleton
-                variant="rectangular"
-                height={140}
-                width="100%"
-                sx={{ mb: 1 }}
-              />
-              <Skeleton height={30} />
-              <Skeleton height={20} width="60%" />
-            </>
-          ) : (
-            <NewsCard {...(item as Article)} />
-          )}
-        </ListItem>
-      ))}
-    </List>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        px: { xs: 1, sm: 2 },
+        py: 3,
+      }}
+    >
+      <Box sx={{ width: "100%", maxWidth: "1500px" }}>
+        <Masonry
+          columns={{ xs: 1, sm: 2, md: 3 }}
+          spacing={2}
+          defaultHeight={450}
+          defaultColumns={3}
+          defaultSpacing={2}
+        >
+          {content}
+        </Masonry>
+      </Box>
+    </Box>
   );
 }

@@ -1,10 +1,10 @@
 import {
   Card,
-  CardContent,
   CardMedia,
   Typography,
-  Button,
-  CardActions,
+  Box,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 
 type Props = {
@@ -24,42 +24,102 @@ export default function NewsCard({
   published_at,
   image,
 }: Props) {
-  const formattedDate = new Date(published_at).toLocaleString("uk-UA", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
-    <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <CardMedia
-        component="img"
-        height="180"
-        image={image || "https://placehold.co/600x400?text=No%20Photo"}
-        alt={title}
-      />
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" gutterBottom>
-          {title}
+    <Card
+      component="a"
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Read full article: ${title}`}
+      sx={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        height: isMobile ? "auto" : 200,
+        borderRadius: 3,
+        boxShadow: 3,
+        color: "inherit",
+        textDecoration: "none",
+        overflow: "hidden",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        "&:hover": {
+          transform: "scale(1.01)",
+          boxShadow: 6,
+        },
+      }}
+    >
+      {image && (
+        <CardMedia
+          component="img"
+          image={image}
+          alt={title}
+          sx={{
+            width: isMobile ? "100%" : 160,
+            height: isMobile ? 160 : "100%",
+            objectFit: "cover",
+            flexShrink: 0,
+          }}
+        />
+      )}
+
+      <Box
+        sx={{
+          flex: 1,
+          p: 2,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          minWidth: 0,
+        }}
+      >
+        <Box>
+          <Typography variant="caption" color="text.secondary" noWrap>
+            {source}
+          </Typography>
+
+          <Typography
+            variant="h6"
+            component="h2"
+            fontWeight={600}
+            sx={{
+              display: "-webkit-box",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              mb: 0.5,
+            }}
+          >
+            {title}
+          </Typography>
+
+          {description && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                display: "-webkit-box",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                WebkitLineClamp: isMobile ? 3 : 2,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {description}
+            </Typography>
+          )}
+        </Box>
+
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+          {new Date(published_at).toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {description?.length > 140
-            ? description.slice(0, 140) + "…"
-            : description}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          Source: {source} | {formattedDate}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button
-          size="small"
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Read more
-        </Button>
-      </CardActions>
+      </Box>
     </Card>
   );
 }
