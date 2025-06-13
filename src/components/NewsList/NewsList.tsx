@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Skeleton } from "@mui/material";
-import Masonry from "@mui/lab/Masonry";
+import Box from "@mui/material/Box";
+import Skeleton from "@mui/material/Skeleton";
 import NewsCard from "../NewsCard/NewsCard";
 
 type Article = {
@@ -44,9 +44,9 @@ export default function NewsList() {
 
   const content = (loading ? Array.from({ length: 8 }) : articles).map(
     (item, i) => (
-      <Box key={i}>
+      <Box key={i} sx={{ breakInside: "avoid" }}>
         {loading ? (
-          <Box>
+          <Box sx={{ mb: 3 }}>
             <Skeleton variant="rectangular" height={200} sx={{ mb: 2 }} />
             <Skeleton height={28} width="90%" />
             <Skeleton height={20} width="70%" />
@@ -67,16 +67,19 @@ export default function NewsList() {
         py: 3,
       }}
     >
-      <Box sx={{ width: "100%", maxWidth: "1500px" }}>
-        <Masonry
-          columns={{ xs: 1, sm: 2, md: 3 }}
-          spacing={2}
-          defaultHeight={450}
-          defaultColumns={3}
-          defaultSpacing={2}
-        >
-          {content}
-        </Masonry>
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: 1500,
+          display: "grid",
+          gap: 6,
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "1fr 1fr",
+          },
+        }}
+      >
+        {content}
       </Box>
     </Box>
   );

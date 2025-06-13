@@ -6,6 +6,7 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   title: string;
@@ -15,6 +16,8 @@ type Props = {
   published_at: string;
   image?: string;
 };
+
+const fallbackImage = "./placeholder-news.svg";
 
 export default function NewsCard({
   title,
@@ -26,14 +29,27 @@ export default function NewsCard({
 }: Props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/news/${encodeURIComponent(title)}`, {
+      state: {
+        title,
+        description,
+        url,
+        source,
+        published_at,
+        image,
+      },
+    });
+  };
 
   return (
     <Card
-      component="a"
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Read full article: ${title}`}
+      component="div"
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
       sx={{
         display: "flex",
         flexDirection: isMobile ? "column" : "row",
@@ -43,6 +59,7 @@ export default function NewsCard({
         color: "inherit",
         textDecoration: "none",
         overflow: "hidden",
+        cursor: "pointer",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           transform: "scale(1.01)",
@@ -50,19 +67,17 @@ export default function NewsCard({
         },
       }}
     >
-      {image && (
-        <CardMedia
-          component="img"
-          image={image}
-          alt={title}
-          sx={{
-            width: isMobile ? "100%" : 160,
-            height: isMobile ? 160 : "100%",
-            objectFit: "cover",
-            flexShrink: 0,
-          }}
-        />
-      )}
+      <CardMedia
+        component="img"
+        image={image?.trim() ? image : fallbackImage}
+        alt={title}
+        sx={{
+          width: isMobile ? "100%" : 160,
+          height: isMobile ? 160 : "100%",
+          objectFit: "cover",
+          flexShrink: 0,
+        }}
+      />
 
       <Box
         sx={{
